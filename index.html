@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiSPP – Sistem Pembayaran SPP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f2f5f3;
+      --surface: #ffffff;
+      --primary: #2e7d52;
+      --primary-light: #e8f5ee;
+      --primary-dark: #1f5c3a;
+      --accent: #4a7c59;
+      --accent-light: #d4ead9;
+      --danger: #c0392b;
+      --danger-light: #fde8e6;
+      --warning: #c47f17;
+      --warning-light: #fef3d0;
+      --text: #1a2e22;
+      --text-muted: #6b7a70;
+      --border: #dde6e0;
+      --sidebar-bg: #1a2e22;
+      --sidebar-text: #9ab5a3;
+      --sidebar-active: #2e7d52;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+    .mono { font-family: 'DM Mono', monospace; }
+
+    /* ───── SCROLLBAR ───── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+    /* ───── LOGIN ───── */
+    #login-screen {
+      min-height: 100vh;
+      background: #f0f2f5;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .login-wrapper {
+      display: flex;
+      width: 100%; max-width: 860px;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+      min-height: 500px;
+    }
+    /* LEFT: foto gedung */
+    .login-image-side {
+      flex: 1.1;
+      position: relative;
+      background: #c8d8e8;
+      overflow: hidden;
+      min-height: 420px;
+    }
+    .login-image-side img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    /* sekolah SVG placeholder jika gambar tidak ada */
+    .login-school-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(160deg, #dce8f5 0%, #b8ccdf 100%);
+    }
+    /* RIGHT: form */
+    .login-form-side {
+      flex: 1;
+      display: flex; flex-direction: column;
+      padding: 40px 36px;
+      position: relative;
+    }
+    .login-topbar {
+      display: flex; justify-content: flex-end; align-items: center;
+      font-size: 13px; color: #555; margin-bottom: 40px; gap: 12px;
+    }
+    .login-topbar a { color: #555; text-decoration: none; }
+    .login-daftar-btn {
+      padding: 5px 14px; border: 1.5px solid #4a7c59; border-radius: 4px;
+      color: #4a7c59; font-size: 13px; font-weight: 500; cursor: pointer;
+      background: none; font-family: inherit;
+      transition: background 0.15s;
+    }
+    .login-daftar-btn:hover { background: #f0faf4; }
+    .login-form-body { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 300px; }
+    .login-school-name {
+      font-size: 15px; font-weight: 700; color: #1a3a2a;
+      margin-bottom: 6px; letter-spacing: 0.01em;
+    }
+    .login-subtitle {
+      font-size: 12px; color: #888; margin-bottom: 28px;
+    }
+    .login-input-group { margin-bottom: 16px; }
+    .login-input-group label {
+      display: block; font-size: 13px; color: #333; font-weight: 500; margin-bottom: 5px;
+    }
+    .login-input {
+      width: 100%; padding: 9px 12px;
+      background: #fff;
+      border: 1.5px solid #5ba07a;
+      border-radius: 4px; color: #222; font-size: 14px;
+      font-family: inherit; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .login-input:focus { border-color: #2e7d52; box-shadow: 0 0 0 3px rgba(46,125,82,0.08); }
+    .login-btn {
+      width: 100%; padding: 10px;
+      background: #fff;
+      color: #333; border: 1.5px solid #aaa; border-radius: 4px;
+      font-size: 14px; font-weight: 500; font-family: inherit;
+      cursor: pointer; margin-top: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .login-btn:hover { background: #f5f5f5; border-color: #888; }
+    .login-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 20px; flex-wrap: wrap; gap: 8px;
+    }
+    .login-footer span { font-size: 13px; color: #555; }
+    .login-hint {
+      margin-top: 24px; padding: 12px 14px;
+      background: #f7faf8;
+      border: 1px solid #d4e9dc;
+      border-radius: 6px;
+    }
+    .login-hint p { color: #666; font-size: 11.5px; margin: 0 0 6px; font-weight: 600; }
+    .hint-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+    .hint-badge {
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    }
+    .badge-siswa { background: #dbeafe; color: #1d4ed8; }
+    .badge-admin { background: #d1fae5; color: #065f46; }
+    .badge-operator { background: #fef3c7; color: #92400e; }
+    .hint-cred { color: #888; font-size: 11px; font-family: 'DM Mono', monospace; }
+    #login-error { color: #dc2626; font-size: 12.5px; margin-bottom: 8px; display: none; }
+    @media (max-width: 640px) {
+      .login-image-side { display: none; }
+      .login-form-side { padding: 32px 24px; }
+    }
+
+    /* ───── APP LAYOUT ───── */
+    #app { display: none; min-height: 100vh; }
+    .app-layout { display: flex; min-height: 100vh; }
+
+    /* ───── SIDEBAR ───── */
+    .sidebar {
+      width: 240px; min-height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100; transition: transform 0.3s;
+    }
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #2e7d52, #4a7c59);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .sidebar-logo-text { color: #fff; font-size: 16px; font-weight: 700; }
+    .sidebar-logo-sub { color: rgba(255,255,255,0.3); font-size: 10px; display: block; }
+    .sidebar-user {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-user-name { color: #fff; font-size: 13px; font-weight: 600; }
+    .sidebar-user-role { color: rgba(255,255,255,0.4); font-size: 11px; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .sidebar-section-label {
+      color: rgba(255,255,255,0.2); font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0 8px 8px; margin-top: 8px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      color: var(--sidebar-text); font-size: 13.5px; font-weight: 500;
+      cursor: pointer; margin-bottom: 2px;
+      transition: all 0.15s; text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .nav-item.active {
+      background: rgba(46,125,82,0.2);
+      color: #6ecf9a;
+    }
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      color: rgba(255,255,255,0.4); font-size: 13.5px; font-weight: 500;
+      cursor: pointer; width: 100%;
+      transition: all 0.15s; background: none; border: none; font-family: inherit;
+    }
+    .logout-btn:hover { background: rgba(239,68,68,0.1); color: #f87171; }
+
+    /* ───── MAIN CONTENT ───── */
+    .main-content {
+      margin-left: 240px; flex: 1;
+      padding: 32px; min-height: 100vh;
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h2 { font-size: 22px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+    .page-header p { color: var(--text-muted); font-size: 14px; margin: 0; }
+
+    /* ───── CARDS ───── */
+    .card {
+      background: var(--surface);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .card-sm { padding: 20px; }
+
+    /* ───── STAT CARDS ───── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--surface);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 20px;
+    }
+    .stat-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 12px;
+    }
+    .stat-value { font-size: 24px; font-weight: 700; color: var(--text); }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ───── TABLE ───── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 12px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 10px 16px; background: #f4f8f5;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 13px 16px; font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f4f8f5; }
+
+    /* ───── BADGES ───── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-green { background: var(--accent-light); color: #1f5c3a; }
+    .badge-red { background: var(--danger-light); color: var(--danger); }
+    .badge-yellow { background: var(--warning-light); color: #92600e; }
+    .badge-blue { background: var(--primary-light); color: var(--primary); }
+
+    /* ───── BUTTONS ───── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 8px;
+      font-size: 13.5px; font-weight: 600; font-family: inherit;
+      cursor: pointer; border: none; transition: all 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+    .btn-outline:hover { background: var(--primary-light); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--primary-light); color: var(--primary); }
+    .btn-sm { padding: 6px 12px; font-size: 12.5px; }
+
+    /* ───── FORM ───── */
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-family: inherit; color: var(--text);
+      background: #fff; outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46,125,82,0.08); }
+    .form-textarea { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ───── MODAL ───── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      z-index: 999; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #fff; border-radius: 16px;
+      padding: 28px; width: 100%; max-width: 460px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      transform: translateY(12px); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 17px; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; }
+    .modal-close:hover { color: var(--text); }
+
+    /* ───── MIDTRANS MOCK ───── */
+    .midtrans-modal .modal { max-width: 380px; }
+    .midtrans-header {
+      background: linear-gradient(135deg, #00447c, #0070ba);
+      color: #fff; border-radius: 10px;
+      padding: 16px; margin-bottom: 20px; text-align: center;
+    }
+    .midtrans-header .logo { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+    .midtrans-header .sub { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+    .midtrans-amount {
+      text-align: center; margin-bottom: 20px;
+    }
+    .midtrans-amount .label { font-size: 12px; color: var(--text-muted); }
+    .midtrans-amount .amount { font-size: 28px; font-weight: 800; color: var(--text); }
+    .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .payment-method {
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 12px; text-align: center; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .payment-method:hover, .payment-method.selected { border-color: var(--primary); background: var(--primary-light); }
+    .payment-method .method-icon { font-size: 22px; margin-bottom: 4px; }
+    .payment-method .method-name { font-size: 12px; font-weight: 600; }
+
+    /* ───── AVATAR ───── */
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .avatar-blue { background: var(--primary-light); color: var(--primary); }
+    .avatar-green { background: var(--accent-light); color: #1f5c3a; }
+    .avatar-yellow { background: var(--warning-light); color: #92600e; }
+
+    /* ───── FILTER BAR ───── */
+    .filter-bar {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-bar input, .filter-bar select {
+      padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 13.5px; font-family: inherit; outline: none;
+      background: #fff; transition: border-color 0.2s;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46,125,82,0.08); }
+    .filter-bar input { min-width: 200px; }
+
+    /* ───── PROFILE CARD ───── */
+    .profile-card {
+      background: linear-gradient(135deg, #2e7d52 0%, #1f5c3a 100%);
+      border-radius: 14px; padding: 24px; color: #fff; margin-bottom: 20px;
+    }
+    .profile-card h3 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .profile-card p { font-size: 13px; opacity: 0.7; margin: 0; }
+
+    /* ───── TAGIHAN CARD ───── */
+    .tagihan-card {
+      border: 1.5px solid var(--border); border-radius: 12px; padding: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; transition: border-color 0.15s;
+    }
+    .tagihan-card:hover { border-color: var(--primary); }
+    .tagihan-card.paid { border-color: var(--accent); background: #f0faf3; }
+    .tagihan-card.overdue { border-color: var(--danger); background: #fdf3f2; }
+
+    /* ───── TOAST ───── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: #1a2e22; color: #fff;
+      padding: 14px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ───── SUCCESS SCREEN ───── */
+    .success-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 16px;
+    }
+
+    /* ───── TOPBAR ───── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .topbar-title { font-size: 20px; font-weight: 700; }
+    .topbar-actions { display: flex; gap: 10px; }
+
+    /* ───── TABS ───── */
+    .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .tab-btn {
+      padding: 10px 18px; font-size: 13.5px; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; border: none; background: none;
+      font-family: inherit; border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: all 0.15s;
+    }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-content { margin-left: 0; padding: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div id="login-screen">
+  <div class="login-wrapper">
+
+    <!-- KIRI: Foto Gedung Sekolah -->
+    <div class="login-image-side">
+      <div class="login-school-placeholder">
+        <svg viewBox="0 0 520 480" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="position:absolute;inset:0;">
+          <!-- Sky gradient -->
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c9dff0"/>
+              <stop offset="100%" stop-color="#e8f3fb"/>
+            </linearGradient>
+            <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8bc87a"/>
+              <stop offset="100%" stop-color="#6aab58"/>
+            </linearGradient>
+            <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f0ebe0"/>
+              <stop offset="100%" stop-color="#e0d9cc"/>
+            </linearGradient>
+          </defs>
+          <!-- Sky -->
+          <rect width="520" height="480" fill="url(#sky)"/>
+          <!-- Clouds -->
+          <ellipse cx="100" cy="60" rx="55" ry="22" fill="white" opacity="0.8"/>
+          <ellipse cx="130" cy="50" rx="40" ry="18" fill="white" opacity="0.9"/>
+          <ellipse cx="370" cy="80" rx="45" ry="18" fill="white" opacity="0.7"/>
+          <ellipse cx="400" cy="70" rx="35" ry="15" fill="white" opacity="0.85"/>
+          <!-- Ground/court -->
+          <rect x="0" y="330" width="520" height="150" fill="url(#grass)"/>
+          <!-- Basketball court lines -->
+          <rect x="30" y="335" width="460" height="130" fill="#7db86d" rx="4"/>
+          <rect x="30" y="335" width="460" height="130" fill="none" stroke="#5a9950" stroke-width="2" rx="4"/>
+          <line x1="260" y1="335" x2="260" y2="465" stroke="#5a9950" stroke-width="1.5"/>
+          <circle cx="260" cy="400" r="35" fill="none" stroke="#5a9950" stroke-width="1.5"/>
+          <!-- Main school building -->
+          <rect x="40" y="160" width="440" height="175" fill="url(#wall)" rx="2"/>
+          <!-- Roof overhang -->
+          <rect x="30" y="150" width="460" height="18" fill="#c8b89a" rx="2"/>
+          <rect x="20" y="145" width="480" height="12" fill="#d4c4a8" rx="2"/>
+          <!-- Upper floor windows row -->
+          <rect x="55" y="170" width="50" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="120" y="170" width="50" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="185" y="170" width="50" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="250" y="170" width="50" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="315" y="170" width="50" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="380" y="170" width="50" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="445" y="170" width="35" height="35" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <!-- Mid floor overhang -->
+          <rect x="30" y="212" width="460" height="10" fill="#c8b89a" opacity="0.7"/>
+          <!-- Lower floor windows row -->
+          <rect x="55" y="228" width="50" height="40" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="120" y="228" width="50" height="40" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="185" y="228" width="50" height="40" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <!-- Center door/entrance -->
+          <rect x="224" y="248" width="72" height="87" fill="#5a8a6a" rx="2"/>
+          <rect x="230" y="254" width="28" height="75" fill="#4a7a5a" rx="1"/>
+          <rect x="262" y="254" width="28" height="75" fill="#4a7a5a" rx="1"/>
+          <rect x="315" y="228" width="50" height="40" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="380" y="228" width="50" height="40" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <rect x="445" y="228" width="35" height="40" fill="#a8c8e8" rx="2" opacity="0.85"/>
+          <!-- Ground floor base -->
+          <rect x="30" y="330" width="460" height="6" fill="#b0a090"/>
+          <!-- Flag pole -->
+          <line x1="140" y1="80" x2="140" y2="165" stroke="#999" stroke-width="3"/>
+          <rect x="140" y="80" width="38" height="25" fill="#e63946" rx="1"/>
+          <rect x="140" y="80" width="38" height="12" fill="#e63946"/>
+          <rect x="140" y="92" width="38" height="13" fill="#ffffff"/>
+          <!-- Trees -->
+          <rect x="468" y="280" width="8" height="55" fill="#6b4c2a"/>
+          <ellipse cx="472" cy="265" rx="28" ry="32" fill="#5a9940"/>
+          <ellipse cx="460" cy="272" rx="20" ry="24" fill="#4e8a35"/>
+          <rect x="14" y="285" width="8" height="50" fill="#6b4c2a"/>
+          <ellipse cx="18" cy="270" rx="26" ry="30" fill="#5a9940"/>
+          <ellipse cx="28" cy="278" rx="18" ry="22" fill="#4e8a35"/>
+          <!-- Small fence -->
+          <rect x="30" y="326" width="460" height="6" fill="#c8b89a"/>
+          <!-- Blue border frame like reference image -->
+        </svg>
+      </div>
+    </div>
+
+    <!-- KANAN: Form Login -->
+    <div class="login-form-side">
+      <div class="login-topbar">
+        <span>belum punya akun?</span>
+        <button class="login-daftar-btn" onclick="showToast('Hubungi operator untuk pendaftaran akun')">Daftar</button>
+      </div>
+
+      <div class="login-form-body">
+        <div class="login-school-name">SMA Negeri 1 Jambi</div>
+        <div class="login-subtitle">Sistem Informasi Pembayaran SPP</div>
+
+        <div class="login-input-group">
+          <label>NISN :</label>
+          <input id="login-id" class="login-input" type="text" placeholder="" />
+        </div>
+        <div class="login-input-group">
+          <label>Password :</label>
+          <input id="login-pass" class="login-input" type="password" placeholder="" />
+        </div>
+        <div id="login-error"></div>
+        <button class="login-btn" onclick="handleLogin()">Login</button>
+
+        <div class="login-footer">
+          <span>belum punya akun?</span>
+          <button class="login-daftar-btn" onclick="showToast('Hubungi operator untuk pendaftaran akun')">Daftar</button>
+        </div>
+
+        <div class="login-hint">
+          <p>Demo akun untuk testing:</p>
+          <div class="hint-row">
+            <span class="hint-badge badge-siswa">Siswa</span>
+            <span class="hint-cred">0012345678 / siswa123</span>
+          </div>
+          <div class="hint-row">
+            <span class="hint-badge badge-admin">Admin</span>
+            <span class="hint-cred">admin001 / admin123</span>
+          </div>
+          <div class="hint-row">
+            <span class="hint-badge badge-operator">Operator</span>
+            <span class="hint-cred">operator001 / ops123</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">🏫</div>
+          <div>
+            <div class="sidebar-logo-text">SiSPP</div>
+            <span class="sidebar-logo-sub">SMA Negeri 1 Jambi</span>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-user-name" id="sidebar-name">—</div>
+        <div class="sidebar-user-role" id="sidebar-role">—</div>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="handleLogout()">
+          <span>🚪</span> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- ══ SISWA PAGES ══ -->
+
+      <!-- S1: Home Siswa -->
+      <div class="page" id="page-s-home">
+        <div class="topbar">
+          <div>
+            <div style="font-size:13px;color:var(--text-muted);">Selamat datang,</div>
+            <div class="topbar-title" id="s-greeting">—</div>
+          </div>
+        </div>
+        <div class="profile-card" style="margin-bottom:24px;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;">👤</div>
+            <div>
+              <h3 id="s-profile-name">—</h3>
+              <p id="s-profile-detail">—</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:18px;">
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;" id="s-stat-lunas">0</div>
+              <div style="font-size:11px;opacity:0.7;">Bulan Lunas</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;" id="s-stat-belum">0</div>
+              <div style="font-size:11px;opacity:0.7;">Belum Bayar</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;" id="s-stat-tahun">2025</div>
+              <div style="font-size:11px;opacity:0.7;">Tahun Ajaran</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px;">Tagihan Terbaru</div>
+          <div id="s-recent-tagihan"></div>
+        </div>
+      </div>
+
+      <!-- S2: Tagihan Siswa -->
+      <div class="page" id="page-s-tagihan">
+        <div class="page-header">
+          <h2>Tagihan SPP</h2>
+          <p>Lihat dan bayar tagihan SPP Anda</p>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'tab-belum')">Belum Dibayar</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-sudah')">Sudah Dibayar</button>
+        </div>
+        <div id="tab-belum">
+          <div id="s-tagihan-belum"></div>
+        </div>
+        <div id="tab-sudah" style="display:none;">
+          <div id="s-tagihan-sudah"></div>
+        </div>
+      </div>
+
+      <!-- S3: Riwayat Siswa -->
+      <div class="page" id="page-s-riwayat">
+        <div class="page-header">
+          <h2>Riwayat Pembayaran</h2>
+          <p>Seluruh riwayat transaksi pembayaran SPP</p>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table id="s-riwayat-table">
+              <thead>
+                <tr>
+                  <th>No. Transaksi</th>
+                  <th>Bulan</th>
+                  <th>Jumlah</th>
+                  <th>Metode</th>
+                  <th>Tanggal Bayar</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="s-riwayat-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ADMIN PAGES ══ -->
+
+      <!-- A1: Home Admin -->
+      <div class="page" id="page-a-home">
+        <div class="topbar">
+          <div>
+            <div style="font-size:13px;color:var(--text-muted);">Dashboard Admin</div>
+            <div class="topbar-title">Ringkasan Pembayaran</div>
+          </div>
+          <button class="btn btn-primary" onclick="showPage('page-a-tagihan')">+ Generate Tagihan</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#e8f5ee;">👥</div>
+            <div class="stat-value">248</div>
+            <div class="stat-label">Total Siswa</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#d4ead9;">✅</div>
+            <div class="stat-value" id="a-stat-lunas">186</div>
+            <div class="stat-label">Sudah Bayar</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fde8e6;">❗</div>
+            <div class="stat-value" id="a-stat-belum">62</div>
+            <div class="stat-label">Belum Bayar</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fef3d0;">💰</div>
+            <div class="stat-value">Rp 74,4jt</div>
+            <div class="stat-label">Pendapatan Bulan Ini</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px;">Pembayaran Terbaru</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nama</th><th>Kelas</th><th>Bulan</th><th>Jumlah</th><th>Status</th></tr>
+              </thead>
+              <tbody id="a-recent-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- A2: Daftar Siswa Admin -->
+      <div class="page" id="page-a-siswa">
+        <div class="page-header">
+          <h2>Daftar Siswa</h2>
+          <p>Kelola dan pantau status pembayaran siswa</p>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="a-search" placeholder="🔍  Cari nama atau NISN..." oninput="filterSiswaAdmin()" />
+          <select id="a-filter-kelas" onchange="filterSiswaAdmin()">
+            <option value="">Semua Kelas</option>
+            <option value="X-A">X-A</option>
+            <option value="X-B">X-B</option>
+            <option value="XI-A">XI-A</option>
+            <option value="XI-B">XI-B</option>
+            <option value="XII-A">XII-A</option>
+            <option value="XII-B">XII-B</option>
+          </select>
+          <select id="a-filter-status" onchange="filterSiswaAdmin()">
+            <option value="">Semua Status</option>
+            <option value="Lunas">Sudah Bayar</option>
+            <option value="Belum">Belum Bayar</option>
+          </select>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama Siswa</th>
+                  <th>NISN</th>
+                  <th>Kelas</th>
+                  <th>Bulan Ini</th>
+                  <th>Tunggakan</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="a-siswa-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- A3: Generate Tagihan Admin -->
+      <div class="page" id="page-a-tagihan">
+        <div class="page-header">
+          <h2>Generate Tagihan</h2>
+          <p>Buat tagihan SPP untuk periode tertentu</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:860px;">
+          <div class="card">
+            <div style="font-size:15px;font-weight:700;margin-bottom:20px;">Generate Tagihan Massal</div>
+            <div class="form-group">
+              <label class="form-label">Periode Bulan</label>
+              <select class="form-select" id="a-gen-bulan">
+                <option>Januari 2025</option><option>Februari 2025</option>
+                <option>Maret 2025</option><option>April 2025</option>
+                <option selected>Mei 2025</option><option>Juni 2025</option>
+                <option>Juli 2025</option><option>Agustus 2025</option>
+                <option>September 2025</option><option>Oktober 2025</option>
+                <option>November 2025</option><option>Desember 2025</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target Kelas</label>
+              <select class="form-select" id="a-gen-kelas">
+                <option value="all">Semua Kelas</option>
+                <option>X-A</option><option>X-B</option>
+                <option>XI-A</option><option>XI-B</option>
+                <option>XII-A</option><option>XII-B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jumlah SPP (Rp)</label>
+              <input type="number" class="form-input" id="a-gen-nominal" value="400000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Jatuh Tempo</label>
+              <input type="date" class="form-input" id="a-gen-jatuh" value="2025-05-20" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Catatan (opsional)</label>
+              <textarea class="form-textarea" id="a-gen-catatan" placeholder="Catatan tambahan..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="generateTagihan()">🗂 Generate Tagihan</button>
+          </div>
+          <div class="card">
+            <div style="font-size:15px;font-weight:700;margin-bottom:20px;">Generate Tagihan Individu</div>
+            <div class="form-group">
+              <label class="form-label">Pilih Siswa</label>
+              <select class="form-select" id="a-gen-siswa">
+                <option value="">-- Pilih Siswa --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bulan Tagihan</label>
+              <select class="form-select">
+                <option>Januari 2025</option><option>Februari 2025</option>
+                <option>Maret 2025</option><option>April 2025</option>
+                <option selected>Mei 2025</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jumlah (Rp)</label>
+              <input type="number" class="form-input" value="400000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keterangan</label>
+              <input type="text" class="form-input" placeholder="Misal: Tagihan susulan" />
+            </div>
+            <button class="btn btn-outline" style="width:100%;margin-top:28px;" onclick="showToast('✅ Tagihan individu berhasil dibuat!')">+ Buat Tagihan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ OPERATOR PAGES ══ -->
+
+      <!-- O1: Home Operator -->
+      <div class="page" id="page-o-home">
+        <div class="topbar">
+          <div>
+            <div style="font-size:13px;color:var(--text-muted);">Dashboard Operator</div>
+            <div class="topbar-title">Manajemen Sistem</div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#dbeafe;">👥</div>
+            <div class="stat-value">248</div>
+            <div class="stat-label">Total Siswa</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#d1fae5;">🛡</div>
+            <div class="stat-value">4</div>
+            <div class="stat-label">Total Admin</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fef3c7;">📋</div>
+            <div class="stat-value">6</div>
+            <div class="stat-label">Kelas Aktif</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#ede9fe;">⚙️</div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Operator Aktif</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Log Aktivitas Terbaru</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Aktivitas sistem 24 jam terakhir</div>
+          <div id="o-activity-log"></div>
+        </div>
+      </div>
+
+      <!-- O2: Lihat Siswa Operator -->
+      <div class="page" id="page-o-siswa">
+        <div class="page-header">
+          <h2>Daftar Siswa</h2>
+          <p>Pantau semua data siswa terdaftar</p>
+        </div>
+        <div class="filter-bar">
+          <input type="text" placeholder="🔍  Cari nama atau NISN..." oninput="filterSiswaOp(this.value)" />
+          <select onchange="filterSiswaOpKelas(this.value)">
+            <option value="">Semua Kelas</option>
+            <option>X-A</option><option>X-B</option>
+            <option>XI-A</option><option>XI-B</option>
+            <option>XII-A</option><option>XII-B</option>
+          </select>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nama</th><th>NISN</th><th>Kelas</th><th>Status Akun</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="o-siswa-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- O3: Buat Akun Siswa -->
+      <div class="page" id="page-o-akun-siswa">
+        <div class="page-header">
+          <h2>Buat Akun Siswa</h2>
+          <p>Daftarkan siswa baru ke dalam sistem</p>
+        </div>
+        <div class="card" style="max-width:600px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:20px;">Data Siswa Baru</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap *</label>
+              <input type="text" class="form-input" id="o-new-nama" placeholder="Nama lengkap siswa" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">NISN *</label>
+              <input type="text" class="form-input" id="o-new-nisn" placeholder="10 digit NISN" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kelas *</label>
+              <select class="form-select" id="o-new-kelas">
+                <option>X-A</option><option>X-B</option>
+                <option>XI-A</option><option>XI-B</option>
+                <option>XII-A</option><option>XII-B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin</label>
+              <select class="form-select" id="o-new-jk">
+                <option>Laki-laki</option>
+                <option>Perempuan</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tanggal Lahir</label>
+              <input type="date" class="form-input" id="o-new-tgl" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">No. HP Orang Tua</label>
+              <input type="tel" class="form-input" id="o-new-hp" placeholder="08xxxxxxxxxx" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat</label>
+            <textarea class="form-textarea" id="o-new-alamat" placeholder="Alamat lengkap siswa"></textarea>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 20px;" />
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text-muted);">Kredensial Login</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input type="password" class="form-input" id="o-new-pass" placeholder="Min. 8 karakter" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Konfirmasi Password *</label>
+              <input type="password" class="form-input" id="o-new-pass2" placeholder="Ulangi password" />
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-primary" onclick="createSiswaAccount()">✅ Buat Akun</button>
+            <button class="btn btn-ghost" onclick="clearNewSiswaForm()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- O4: Kelola Akun -->
+      <div class="page" id="page-o-kelola">
+        <div class="page-header">
+          <h2>Kelola Akun</h2>
+          <p>Manajemen akun admin dan siswa</p>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'tab-kelola-admin')">Akun Admin</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-kelola-siswa')">Akun Siswa</button>
+        </div>
+        <div id="tab-kelola-admin">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-admin')">+ Tambah Admin</button>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Nama</th><th>ID Login</th><th>Email</th><th>Status</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="o-admin-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div id="tab-kelola-siswa" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Nama</th><th>NISN</th><th>Kelas</th><th>Status Akun</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="o-kelola-siswa-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Midtrans Payment Modal -->
+<div class="modal-overlay midtrans-modal" id="modal-midtrans">
+  <div class="modal">
+    <div class="midtrans-header">
+      <div class="logo">💳 Midtrans</div>
+      <div class="sub">Secure Payment Gateway</div>
+    </div>
+    <div class="midtrans-amount">
+      <div class="label">Total Pembayaran</div>
+      <div class="amount" id="midtrans-amount-text">Rp 400.000</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px;" id="midtrans-desc">SPP Mei 2025</div>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;">Pilih Metode Pembayaran:</div>
+    <div class="payment-methods" id="payment-methods-grid">
+      <div class="payment-method" onclick="selectPayment(this)">
+        <div class="method-icon">🏦</div>
+        <div class="method-name">Transfer Bank</div>
+      </div>
+      <div class="payment-method" onclick="selectPayment(this)">
+        <div class="method-icon">💚</div>
+        <div class="method-name">GoPay</div>
+      </div>
+      <div class="payment-method" onclick="selectPayment(this)">
+        <div class="method-icon">💙</div>
+        <div class="method-name">OVO</div>
+      </div>
+      <div class="payment-method" onclick="selectPayment(this)">
+        <div class="method-icon">💳</div>
+        <div class="method-name">Kartu Kredit</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="processMidtransPayment()" id="midtrans-pay-btn" disabled>Bayar Sekarang</button>
+    <button class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="closeModal('modal-midtrans')">Batal</button>
+  </div>
+</div>
+
+<!-- Payment Success Modal -->
+<div class="modal-overlay" id="modal-success">
+  <div class="modal" style="text-align:center;">
+    <div class="success-icon">✅</div>
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Pembayaran Berhasil!</h3>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;" id="success-desc">Pembayaran SPP Mei 2025 telah berhasil diproses.</p>
+    <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:20px;text-align:left;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+        <span style="color:var(--text-muted);">No. Transaksi</span>
+        <span class="mono" style="font-weight:600;" id="success-trx-id">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+        <span style="color:var(--text-muted);">Jumlah</span>
+        <span style="font-weight:600;" id="success-amount">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;">
+        <span style="color:var(--text-muted);">Metode</span>
+        <span style="font-weight:600;" id="success-method">—</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeModal('modal-success');loadSiswaData()">Selesai</button>
+  </div>
+</div>
+
+<!-- Profile Siswa (Admin view) -->
+<div class="modal-overlay" id="modal-profile-siswa">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Profil Siswa</div>
+      <button class="modal-close" onclick="closeModal('modal-profile-siswa')">✕</button>
+    </div>
+    <div id="modal-profile-content"></div>
+  </div>
+</div>
+
+<!-- Add Admin Modal (Operator) -->
+<div class="modal-overlay" id="modal-add-admin">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Tambah Akun Admin</div>
+      <button class="modal-close" onclick="closeModal('modal-add-admin')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nama Lengkap</label>
+      <input type="text" class="form-input" id="o-admin-nama" placeholder="Nama admin" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">ID Login</label>
+      <input type="text" class="form-input" id="o-admin-id" placeholder="Contoh: admin005" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="o-admin-email" placeholder="admin@sekolah.sch.id" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="o-admin-pass" placeholder="Min. 8 karakter" />
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="addAdmin()">Tambah Admin</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-admin')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span id="toast-msg">—</span></div>
+
+<!-- ══════════ SCRIPT ══════════ -->
+<script>
+// ══════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════
+const USERS = {
+  '0012345678': { pass: 'siswa123', role: 'siswa', name: 'Ahmad Fauzi', nisn: '0012345678', kelas: 'XI-A', jk: 'Laki-laki', tgl_lahir: '12 Maret 2008', alamat: 'Jl. Soekarno-Hatta No.45, Jambi' },
+  'admin001':   { pass: 'admin123', role: 'admin', name: 'Budi Santoso' },
+  'operator001':{ pass: 'ops123',   role: 'operator', name: 'Siti Rahayu' },
+};
+
+const SISWA_LIST = [
+  { id:'0012345678', nama:'Ahmad Fauzi',     nisn:'0012345678', kelas:'XI-A', status:'Lunas',  tunggakan:0 },
+  { id:'0023456789', nama:'Dewi Pratiwi',    nisn:'0023456789', kelas:'XI-A', status:'Belum',  tunggakan:2 },
+  { id:'0034567890', nama:'Rizki Maulana',   nisn:'0034567890', kelas:'X-B',  status:'Lunas',  tunggakan:0 },
+  { id:'0045678901', nama:'Sari Indah',      nisn:'0045678901', kelas:'XII-A',status:'Belum',  tunggakan:3 },
+  { id:'0056789012', nama:'Budi Setiawan',   nisn:'0056789012', kelas:'X-A',  status:'Lunas',  tunggakan:0 },
+  { id:'0067890123', nama:'Laila Nur',       nisn:'0067890123', kelas:'XII-B',status:'Belum',  tunggakan:1 },
+  { id:'0078901234', nama:'Agus Hermawan',   nisn:'0078901234', kelas:'XI-B', status:'Lunas',  tunggakan:0 },
+  { id:'0089012345', nama:'Putri Maharani',  nisn:'0089012345', kelas:'X-B',  status:'Lunas',  tunggakan:0 },
+];
+
+const TAGIHAN_SISWA = [
+  { id:'T001', bulan:'Januari 2025', nominal:400000, status:'Lunas',  trx:'TRX20250110001', tanggal:'10 Jan 2025', metode:'GoPay' },
+  { id:'T002', bulan:'Februari 2025',nominal:400000, status:'Lunas',  trx:'TRX20250208002', tanggal:'8 Feb 2025',  metode:'Transfer Bank' },
+  { id:'T003', bulan:'Maret 2025',   nominal:400000, status:'Lunas',  trx:'TRX20250305003', tanggal:'5 Mar 2025',  metode:'OVO' },
+  { id:'T004', bulan:'April 2025',   nominal:400000, status:'Lunas',  trx:'TRX20250402004', tanggal:'2 Apr 2025',  metode:'GoPay' },
+  { id:'T005', bulan:'Mei 2025',     nominal:400000, status:'Belum',  trx:null, tanggal:null, metode:null },
+  { id:'T006', bulan:'Juni 2025',    nominal:400000, status:'Belum',  trx:null, tanggal:null, metode:null },
+];
+
+const ADMIN_LIST = [
+  { id:'admin001', nama:'Budi Santoso',    email:'budi@sma1jambi.sch.id', status:'Aktif' },
+  { id:'admin002', nama:'Rina Wati',       email:'rina@sma1jambi.sch.id', status:'Aktif' },
+  { id:'admin003', nama:'Hendra Kusuma',   email:'hendra@sma1jambi.sch.id',status:'Nonaktif' },
+  { id:'admin004', nama:'Maya Sari',       email:'maya@sma1jambi.sch.id',  status:'Aktif' },
+];
+
+let currentUser = null;
+let currentRole = null;
+let selectedPaymentMethod = null;
+let payingTagihanId = null;
+let filteredSiswa = [...SISWA_LIST];
+
+// ══════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════
+function handleLogin() {
+  const id   = document.getElementById('login-id').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err  = document.getElementById('login-error');
+  const u    = USERS[id];
+  if (!u || u.pass !== pass) {
+    err.textContent = 'ID / NISN atau password salah.';
+    err.style.display = 'block';
+    err.style.color = '#dc2626';
+    err.style.fontSize = '12.5px';
+    err.style.marginBottom = '8px';
+    return;
+  }
+  err.style.display = 'none';
+  currentUser = u;
+  currentRole = u.role;
+  initApp();
+}
+
+function handleLogout() {
+  currentUser = null; currentRole = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-id').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ══════════════════════════════════════
+//  APP INIT
+// ══════════════════════════════════════
+const NAV_CONFIG = {
+  siswa: [
+    { id:'page-s-home',    icon:'🏠', label:'Beranda' },
+    { id:'page-s-tagihan', icon:'📄', label:'Tagihan SPP' },
+    { id:'page-s-riwayat', icon:'📋', label:'Riwayat' },
+  ],
+  admin: [
+    { id:'page-a-home',    icon:'🏠', label:'Beranda' },
+    { id:'page-a-siswa',   icon:'👥', label:'Daftar Siswa' },
+    { id:'page-a-tagihan', icon:'🗂', label:'Generate Tagihan' },
+  ],
+  operator: [
+    { id:'page-o-home',       icon:'🏠', label:'Beranda' },
+    { id:'page-o-siswa',      icon:'👁', label:'Lihat Siswa' },
+    { id:'page-o-akun-siswa', icon:'➕', label:'Buat Akun Siswa' },
+    { id:'page-o-kelola',     icon:'⚙️', label:'Kelola Akun' },
+  ],
+};
+
+function initApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('sidebar-name').textContent = currentUser.name;
+  const roleLabel = { siswa:'Siswa', admin:'Administrator', operator:'Operator' };
+  document.getElementById('sidebar-role').textContent = roleLabel[currentRole];
+
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+  const items = NAV_CONFIG[currentRole];
+  items.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'nav-item' + (i === 0 ? ' active' : '');
+    el.innerHTML = `<span class="nav-icon">${item.icon}</span>${item.label}`;
+    el.onclick = () => showPage(item.id);
+    nav.appendChild(el);
+  });
+
+  // Show first page
+  showPage(items[0].id);
+  loadRoleData();
+}
+
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(pageId);
+  if (target) target.classList.add('active');
+
+  // Update nav
+  const items = NAV_CONFIG[currentRole] || [];
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', items[i]?.id === pageId);
+  });
+}
+
+function loadRoleData() {
+  if (currentRole === 'siswa')    loadSiswaData();
+  if (currentRole === 'admin')    loadAdminData();
+  if (currentRole === 'operator') loadOperatorData();
+}
+
+// ══════════════════════════════════════
+//  SISWA DATA
+// ══════════════════════════════════════
+function loadSiswaData() {
+  const u = currentUser;
+  document.getElementById('s-greeting').textContent = u.name;
+  document.getElementById('s-profile-name').textContent = u.name;
+  document.getElementById('s-profile-detail').textContent = `NISN: ${u.nisn}  •  Kelas ${u.kelas}`;
+
+  const lunas = TAGIHAN_SISWA.filter(t => t.status === 'Lunas').length;
+  const belum = TAGIHAN_SISWA.filter(t => t.status === 'Belum').length;
+  document.getElementById('s-stat-lunas').textContent = lunas;
+  document.getElementById('s-stat-belum').textContent = belum;
+
+  // Recent tagihan
+  const recent = TAGIHAN_SISWA.slice(-3).reverse();
+  document.getElementById('s-recent-tagihan').innerHTML = recent.map(t => buildTagihanCard(t)).join('');
+
+  // Tagihan belum
+  const belumList = TAGIHAN_SISWA.filter(t => t.status === 'Belum');
+  document.getElementById('s-tagihan-belum').innerHTML = belumList.length
+    ? belumList.map(t => buildTagihanCard(t)).join('')
+    : '<p style="color:var(--text-muted);font-size:14px;text-align:center;padding:32px 0;">🎉 Semua tagihan sudah terbayar!</p>';
+
+  const lunasList = TAGIHAN_SISWA.filter(t => t.status === 'Lunas');
+  document.getElementById('s-tagihan-sudah').innerHTML = lunasList.map(t => buildTagihanCard(t)).join('');
+
+  // Riwayat
+  const riwayat = TAGIHAN_SISWA.filter(t => t.status === 'Lunas');
+  document.getElementById('s-riwayat-body').innerHTML = riwayat.map(t => `
+    <tr>
+      <td class="mono" style="font-size:12px;">${t.trx}</td>
+      <td>${t.bulan}</td>
+      <td style="font-weight:600;">Rp ${t.nominal.toLocaleString('id')}</td>
+      <td>${t.metode}</td>
+      <td>${t.tanggal}</td>
+      <td><span class="badge badge-green">Lunas</span></td>
+    </tr>`).join('');
+}
+
+function buildTagihanCard(t) {
+  const cls = t.status === 'Lunas' ? 'paid' : (t.status === 'Belum' ? '' : 'overdue');
+  const badge = t.status === 'Lunas'
+    ? '<span class="badge badge-green">Lunas</span>'
+    : '<span class="badge badge-red">Belum Bayar</span>';
+  const action = t.status === 'Belum'
+    ? `<button class="btn btn-primary btn-sm" onclick="openMidtrans('${t.id}','${t.bulan}',${t.nominal})">💳 Bayar</button>`
+    : `<span style="color:var(--text-muted);font-size:12px;">${t.tanggal}</span>`;
+  return `
+    <div class="tagihan-card ${cls}">
+      <div>
+        <div style="font-weight:600;font-size:14px;">${t.bulan}</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">Rp ${t.nominal.toLocaleString('id')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        ${badge}
+        ${action}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════
+//  MIDTRANS
+// ══════════════════════════════════════
+function openMidtrans(id, bulan, nominal) {
+  payingTagihanId = id;
+  document.getElementById('midtrans-amount-text').textContent = 'Rp ' + nominal.toLocaleString('id');
+  document.getElementById('midtrans-desc').textContent = 'SPP ' + bulan;
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  selectedPaymentMethod = null;
+  document.getElementById('midtrans-pay-btn').disabled = true;
+  openModal('modal-midtrans');
+}
+
+function selectPayment(el) {
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPaymentMethod = el.querySelector('.method-name').textContent;
+  document.getElementById('midtrans-pay-btn').disabled = false;
+}
+
+function processMidtransPayment() {
+  const t = TAGIHAN_SISWA.find(t => t.id === payingTagihanId);
+  if (!t) return;
+  t.status  = 'Lunas';
+  t.metode  = selectedPaymentMethod;
+  t.tanggal = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+  t.trx     = 'TRX' + Date.now().toString().slice(-10);
+
+  document.getElementById('success-desc').textContent    = `Pembayaran ${t.bulan} telah berhasil diproses.`;
+  document.getElementById('success-trx-id').textContent  = t.trx;
+  document.getElementById('success-amount').textContent  = 'Rp ' + t.nominal.toLocaleString('id');
+  document.getElementById('success-method').textContent  = t.metode;
+  closeModal('modal-midtrans');
+  setTimeout(() => openModal('modal-success'), 200);
+  loadSiswaData();
+}
+
+// ══════════════════════════════════════
+//  ADMIN DATA
+// ══════════════════════════════════════
+function loadAdminData() {
+  // Recent payments
+  const recent = SISWA_LIST.filter(s => s.status === 'Lunas').slice(0,5);
+  document.getElementById('a-recent-body').innerHTML = recent.map(s => `
+    <tr>
+      <td>${s.nama}</td>
+      <td><span class="badge badge-blue">${s.kelas}</span></td>
+      <td>Mei 2025</td>
+      <td style="font-weight:600;">Rp 400.000</td>
+      <td><span class="badge badge-green">Lunas</span></td>
+    </tr>`).join('');
+
+  // Populate siswa select in generate
+  const sel = document.getElementById('a-gen-siswa');
+  sel.innerHTML = '<option value="">-- Pilih Siswa --</option>' +
+    SISWA_LIST.map(s => `<option value="${s.id}">${s.nama} (${s.kelas})</option>`).join('');
+
+  filterSiswaAdmin();
+}
+
+function filterSiswaAdmin() {
+  const q       = (document.getElementById('a-search')?.value || '').toLowerCase();
+  const kelas   = document.getElementById('a-filter-kelas')?.value || '';
+  const status  = document.getElementById('a-filter-status')?.value || '';
+
+  const filtered = SISWA_LIST.filter(s =>
+    (s.nama.toLowerCase().includes(q) || s.nisn.includes(q)) &&
+    (kelas  === '' || s.kelas  === kelas) &&
+    (status === '' || s.status === status)
+  );
+
+  document.getElementById('a-siswa-body').innerHTML = filtered.map(s => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="avatar avatar-blue">${s.nama[0]}</div>
+          <div>
+            <div style="font-weight:600;font-size:13.5px;">${s.nama}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${s.nisn}</div>
+          </div>
+        </div>
+      </td>
+      <td>${s.nisn}</td>
+      <td><span class="badge badge-blue">${s.kelas}</span></td>
+      <td>${s.status === 'Lunas'
+        ? '<span class="badge badge-green">Lunas</span>'
+        : '<span class="badge badge-red">Belum Bayar</span>'}</td>
+      <td>${s.tunggakan > 0
+        ? `<span class="badge badge-yellow">${s.tunggakan} bulan</span>`
+        : '<span style="color:var(--text-muted);font-size:13px;">-</span>'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="viewSiswaProfile('${s.id}')">👁 Profil</button>
+      </td>
+    </tr>`).join('');
+}
+
+function viewSiswaProfile(id) {
+  const s = SISWA_LIST.find(x => x.id === id);
+  if (!s) return;
+  const tagihanSiswa = TAGIHAN_SISWA.slice(0,4);
+  document.getElementById('modal-profile-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <div class="avatar avatar-blue" style="width:52px;height:52px;font-size:20px;">${s.nama[0]}</div>
+      <div>
+        <div style="font-size:17px;font-weight:700;">${s.nama}</div>
+        <div style="font-size:13px;color:var(--text-muted);">NISN: ${s.nisn} • Kelas ${s.kelas}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:#f9fafb;border-radius:8px;padding:12px;">
+        <div style="font-size:11px;color:var(--text-muted);">STATUS BULAN INI</div>
+        <div style="font-weight:700;margin-top:4px;">${s.status === 'Lunas'
+          ? '<span style="color:#059669;">✅ Lunas</span>'
+          : '<span style="color:#ef4444;">❗ Belum Bayar</span>'}</div>
+      </div>
+      <div style="background:#f9fafb;border-radius:8px;padding:12px;">
+        <div style="font-size:11px;color:var(--text-muted);">TUNGGAKAN</div>
+        <div style="font-weight:700;margin-top:4px;">${s.tunggakan} bulan</div>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Riwayat Pembayaran:</div>
+    ${tagihanSiswa.map(t => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:13px;font-weight:500;">${t.bulan}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Rp ${t.nominal.toLocaleString('id')}</div>
+        </div>
+        <span class="badge ${t.status === 'Lunas' ? 'badge-green' : 'badge-red'}">${t.status}</span>
+      </div>`).join('')}
+  `;
+  openModal('modal-profile-siswa');
+}
+
+function generateTagihan() {
+  const bulan   = document.getElementById('a-gen-bulan').value;
+  const kelas   = document.getElementById('a-gen-kelas').value;
+  const nominal = document.getElementById('a-gen-nominal').value;
+  showToast(`✅ Tagihan ${bulan} untuk ${kelas === 'all' ? 'semua kelas' : 'kelas '+kelas} (Rp ${parseInt(nominal).toLocaleString('id')}) berhasil dibuat!`);
+}
+
+// ══════════════════════════════════════
+//  OPERATOR DATA
+// ══════════════════════════════════════
+function loadOperatorData() {
+  // Activity log
+  const logs = [
+    { time:'08:42', action:'Akun baru dibuat untuk Dewi Lestari (X-A)', icon:'➕', color:'#dbeafe' },
+    { time:'08:15', action:'Admin Rina Wati login ke sistem', icon:'🔑', color:'#d1fae5' },
+    { time:'07:58', action:'Generate tagihan Mei 2025 untuk Kelas XII-A', icon:'🗂', color:'#fef3c7' },
+    { time:'Yesterday', action:'Password admin Hendra Kusuma direset', icon:'🔒', color:'#ede9fe' },
+    { time:'Yesterday', action:'5 akun siswa baru berhasil didaftarkan', icon:'👥', color:'#dbeafe' },
+  ];
+  document.getElementById('o-activity-log').innerHTML = logs.map(l => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="width:32px;height:32px;border-radius:8px;background:${l.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;">${l.icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:13.5px;">${l.action}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${l.time}</div>
+    </div>`).join('');
+
+  renderOpSiswa(SISWA_LIST);
+  renderAdminList();
+  renderKelolaList();
+}
+
+function renderOpSiswa(list) {
+  document.getElementById('o-siswa-body').innerHTML = list.map(s => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="avatar avatar-blue">${s.nama[0]}</div>
+          <span style="font-weight:500;">${s.nama}</span>
+        </div>
+      </td>
+      <td class="mono" style="font-size:12px;">${s.nisn}</td>
+      <td><span class="badge badge-blue">${s.kelas}</span></td>
+      <td><span class="badge badge-green">Aktif</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Edit akun ${s.nama}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:4px;" onclick="showToast('⚠️ Konfirmasi nonaktifkan akun')">🚫</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterSiswaOp(q) {
+  const filtered = SISWA_LIST.filter(s =>
+    s.nama.toLowerCase().includes(q.toLowerCase()) || s.nisn.includes(q)
+  );
+  renderOpSiswa(filtered);
+}
+function filterSiswaOpKelas(kelas) {
+  const filtered = kelas ? SISWA_LIST.filter(s => s.kelas === kelas) : SISWA_LIST;
+  renderOpSiswa(filtered);
+}
+
+function renderAdminList() {
+  document.getElementById('o-admin-body').innerHTML = ADMIN_LIST.map(a => `
+    <tr>
+      <td style="font-weight:500;">${a.nama}</td>
+      <td class="mono" style="font-size:12px;">${a.id}</td>
+      <td style="color:var(--text-muted);font-size:13px;">${a.email}</td>
+      <td><span class="badge ${a.status === 'Aktif' ? 'badge-green' : 'badge-red'}">${a.status}</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Edit admin ${a.nama}')">✏️</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:4px;" onclick="toggleAdminStatus('${a.id}')">🔄</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderKelolaList() {
+  document.getElementById('o-kelola-siswa-body').innerHTML = SISWA_LIST.map(s => `
+    <tr>
+      <td style="font-weight:500;">${s.nama}</td>
+      <td class="mono" style="font-size:12px;">${s.nisn}</td>
+      <td><span class="badge badge-blue">${s.kelas}</span></td>
+      <td><span class="badge badge-green">Aktif</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Edit akun ${s.nama}')">✏️ Edit</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:4px;" onclick="showToast('Reset password ${s.nama}')">🔒 Reset PW</button>
+      </td>
+    </tr>`).join('');
+}
+
+function toggleAdminStatus(id) {
+  const a = ADMIN_LIST.find(x => x.id === id);
+  if (a) {
+    a.status = a.status === 'Aktif' ? 'Nonaktif' : 'Aktif';
+    renderAdminList();
+    showToast(`Status admin ${a.nama} diubah ke ${a.status}`);
+  }
+}
+
+function createSiswaAccount() {
+  const nama  = document.getElementById('o-new-nama').value.trim();
+  const nisn  = document.getElementById('o-new-nisn').value.trim();
+  const pass  = document.getElementById('o-new-pass').value;
+  const pass2 = document.getElementById('o-new-pass2').value;
+  if (!nama || !nisn) { showToast('⚠️ Nama dan NISN wajib diisi!'); return; }
+  if (pass !== pass2)  { showToast('⚠️ Password tidak cocok!'); return; }
+  if (pass.length < 8) { showToast('⚠️ Password min. 8 karakter!'); return; }
+  showToast(`✅ Akun siswa ${nama} (${nisn}) berhasil dibuat!`);
+  clearNewSiswaForm();
+}
+
+function clearNewSiswaForm() {
+  ['o-new-nama','o-new-nisn','o-new-hp','o-new-alamat','o-new-pass','o-new-pass2'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function addAdmin() {
+  const nama = document.getElementById('o-admin-nama').value.trim();
+  const id   = document.getElementById('o-admin-id').value.trim();
+  if (!nama || !id) { showToast('⚠️ Nama dan ID wajib diisi!'); return; }
+  ADMIN_LIST.push({ id, nama, email: document.getElementById('o-admin-email').value, status:'Aktif' });
+  renderAdminList();
+  closeModal('modal-add-admin');
+  showToast(`✅ Admin ${nama} berhasil ditambahkan!`);
+}
+
+// ══════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+function switchTab(btn, tabId) {
+  const parent = btn.closest('.page') || document.body;
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const container = btn.closest('.page');
+  const all = btn.parentElement.querySelectorAll('.tab-btn');
+  all.forEach(b => {
+    const t = container.querySelector('#' + b.dataset?.tab || '');
+  });
+  // Simple: show/hide by collecting sibling tab content
+  const panel = document.getElementById(tabId);
+  if (!panel) return;
+  const allPanels = [...btn.parentElement.parentElement.querySelectorAll('[id^="tab-"]')];
+  allPanels.forEach(p => p.style.display = 'none');
+  panel.style.display = 'block';
+}
+
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Close modals with Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
